@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login System</title>
+</head>
+<body>
+    <div id="loginContainer">
+        <h2>Login</h2>
+        <input type="text" id="username" placeholder="Username" required>
+        <br><br>
+        <input type="password" id="password" placeholder="Password" required>
+        <br><br>
+        <button onclick="login()">Login</button>
+        <br><br>
+        <p id="message"></p>
+    </div>
+
+    <div id="dashboard" style="display:none;">
+        <h2>Welcome, <span id="userName"></span>!</h2>
+        <button onclick="logout()">Logout</button>
+        <p>You are successfully logged in!</p>
+    </div>
+
+    <script>
+        // Default users (username:password)
+        const validUsers = {
+            'admin': '123456',
+            'user': 'password',
+            'test': 'test123'
+        };
+
+        // Check if user is already logged in
+        window.onload = function() {
+            const loggedUser = localStorage.getItem('loggedUser');
+            if (loggedUser) {
+                showDashboard(loggedUser);
+            }
+        };
+
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const message = document.getElementById('message');
+
+            // Validate inputs
+            if (!username || !password) {
+                message.textContent = 'Please enter username and password!';
+                message.style.color = 'red';
+                return;
+            }
+
+            // Check credentials
+            if (validUsers[username] && validUsers[username] === password) {
+                // Save to localStorage
+                localStorage.setItem('loggedUser', username);
+                localStorage.setItem('loginTime', new Date().toISOString());
+                
+                showDashboard(username);
+                message.textContent = 'Login successful!';
+                message.style.color = 'green';
+            } else {
+                message.textContent = 'Invalid username or password!';
+                message.style.color = 'red';
+            }
+        }
+
+        function showDashboard(username) {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('userName').textContent = username;
+        }
+
+        function logout() {
+            // Clear localStorage
+            localStorage.removeItem('loggedUser');
+            localStorage.removeItem('loginTime');
+            
+            // Show login form
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            
+            // Clear form
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('message').textContent = '';
+        }
+
+        // Allow Enter key to login
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
